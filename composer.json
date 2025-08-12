@@ -1,0 +1,25 @@
+{
+    "name": "tales/catalogo",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Tales\\Catalogo\\": "catalogo/",
+            "Model\\": "Model/",
+            "Controller\\": "Controller/"
+        },
+        "files": [
+            "Config/configuration.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "talesrockstar",
+            "email": "talesrodrigues230607@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=8.0",
+        "ext-mbstring": "*"
+    }
+}

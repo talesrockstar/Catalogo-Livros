@@ -26,6 +26,15 @@ class Livros
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getLivroById($id)
+    {
+        $sql = "SELECT * FROM livros WHERE id = :id";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function createLivros()
     {
         $sql = "INSERT INTO livros (titulo, autor, genero) VALUES (:titulo, :autor, :genero)";
@@ -59,6 +68,24 @@ class Livros
         $stmt->bindParam(":id", $this->id, PDO::PARAM_INT);
 
         return $stmt->execute();
+    }
+
+    public function getLivrosByAutor($autor)
+    {
+        $sql = "SELECT * FROM livros WHERE autor = :autor";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(":autor", $autor, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getLivrosByGenero($genero)
+    {
+        $sql = "SELECT * FROM livros WHERE genero = :genero";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bindParam(":genero", $genero, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
 

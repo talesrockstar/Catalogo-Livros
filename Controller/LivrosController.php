@@ -7,26 +7,66 @@ require_once __DIR__ . '/../Config/configuration.php';
 
 class LivrosController
 {
-    // Função para pegar todos os livros
+    private function sanitizeArray($array)
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = $this->sanitizeArray($value);
+            } else {
+                $array[$key] = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+            }
+        }
+        return $array;
+    }
+
     public function getLivros()
     {
+        $id = $_GET['id'] ?? null;
+        $autor = $_GET['autor'] ?? null;
+        $genero = $_GET['genero'] ?? null;
         $livro = new Livros();
-        $livros = $livro->getLivros();
 
-        if ($livros) {
-            // Envia a resposta JSON
-            header('Content-Type: application/json', true, 200);
-            echo json_encode($livros);
+        if ($id) {
+            $result = $livro->getLivroById($id);
+            if ($result) {
+                header('Content-Type: application/json', true, 200);
+                echo json_encode($this->sanitizeArray($result));
+            } else {
+                header('Content-Type: application/json', true, 404);
+                echo json_encode(["message" => "Livro não encontrado"]);
+            }
+        } elseif ($autor) {
+            $result = $livro->getLivrosByAutor($autor);
+            if ($result) {
+                header('Content-Type: application/json', true, 200);
+                echo json_encode($this->sanitizeArray($result));
+            } else {
+                header('Content-Type: application/json', true, 404);
+                echo json_encode(["message" => "Nenhum livro encontrado para esse autor"]);
+            }
+        } elseif ($genero) {
+            $result = $livro->getLivrosByGenero($genero);
+            if ($result) {
+                header('Content-Type: application/json', true, 200);
+                echo json_encode($this->sanitizeArray($result));
+            } else {
+                header('Content-Type: application/json', true, 404);
+                echo json_encode(["message" => "Nenhum livro encontrado para esse gênero"]);
+            }
         } else {
-            header('Content-Type: application/json', true, 404);
-            echo json_encode(["message" => "Livros não encontrados"]);
+            $livros = $livro->getLivros();
+            if ($livros) {
+                header('Content-Type: application/json', true, 200);
+                echo json_encode($this->sanitizeArray($livros));
+            } else {
+                header('Content-Type: application/json', true, 404);
+                echo json_encode(["message" => "Livros não encontrados"]);
+            }
         }
     }
 
-    // Função para criar um livro
     public function createLivros()
     {
-        // Obtém os dados da requisição
         $data = json_decode(file_get_contents("php://input"));
 
         if (isset($data->titulo) && isset($data->autor) && isset($data->genero)) {
@@ -48,10 +88,8 @@ class LivrosController
         }
     }
 
-    // Função para editar um livro
     public function updateLivros()
     {
-        // Obtém os dados da requisição
         $data = json_decode(file_get_contents("php://input"));
 
         if (isset($data->id) && isset($data->titulo) && isset($data->autor) && isset($data->genero)) {
@@ -74,10 +112,8 @@ class LivrosController
         }
     }
 
-    // Função para excluir um livro
     public function deleteLivros()
     {
-        // Obtém os dados da requisição
         $id = $_GET['id'] ?? null; // Verifica se o ID foi passado na URL
 
         if ($id) {
